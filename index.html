@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheese Clicker 🧀</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #fceabb;
+            user-select: none;
+        }
+        #cheese {
+            font-size: 100px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+        }
+        #count {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #advancements {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        .advancement.locked {
+            color: gray;
+        }
+        .advancement {
+            margin: 5px 0;
+        }
+        #advancements-button {
+            margin-top: 10px;
+            padding: 10px;
+            background: #ffcc00;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #cheese-name {
+            font-size: 30px;
+            cursor: pointer;
+        }
+        #cheat-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="cheese-name">🧀 Cheese Clicker 🧀</h1>
+    <div id="cheese">🧀</div>
+    <p id="count">Clicks: 0</p>
+    <button id="advancements-button" onclick="toggleAdvancements()">Show Advancements</button>
+    <div id="advancements">
+        <h2>Advancements</h2>
+        <p class="advancement locked" id="adv1">Novice Cheeser (50 clicks)</p>
+        <p class="advancement locked" id="adv2">Better Cheeser (100 clicks)</p>
+        <p class="advancement locked" id="adv3">Cheese Expert (500 clicks)</p>
+        <p class="advancement locked" id="adv4">Master Cheeser (1000 clicks)</p>
+        <p class="advancement locked" id="adv5">Ultimate Cheese Lord (100000 clicks)</p>
+        <button onclick="toggleAdvancements()">Close</button>
+    </div>
+    <input type="number" id="cheat-input" placeholder="Enter clicks" onkeypress="if(event.key === 'Enter') applyCheat()">
+    
+    <script>
+        let clicks = 0;
+        const cheese = document.getElementById("cheese");
+        const countDisplay = document.getElementById("count");
+        const advancements = document.getElementById("advancements");
+        const cheeseName = document.getElementById("cheese-name");
+        const cheatInput = document.getElementById("cheat-input");
+
+        cheese.addEventListener("click", () => {
+            clicks++;
+            countDisplay.textContent = "Clicks: " + clicks;
+            checkAdvancements();
+        });
+
+        function checkAdvancements() {
+            if (clicks >= 50) document.getElementById("adv1").classList.remove("locked");
+            if (clicks >= 100) document.getElementById("adv2").classList.remove("locked");
+            if (clicks >= 500) document.getElementById("adv3").classList.remove("locked");
+            if (clicks >= 1000) document.getElementById("adv4").classList.remove("locked");
+            if (clicks >= 100000) document.getElementById("adv5").classList.remove("locked");
+        }
+
+        function toggleAdvancements() {
+            advancements.style.display = advancements.style.display === "none" ? "block" : "none";
+        }
+
+        cheeseName.addEventListener("click", () => {
+            cheatInput.style.display = "block";
+            cheatInput.focus();
+        });
+
+        function applyCheat() {
+            let cheatValue = parseInt(cheatInput.value);
+            if (!isNaN(cheatValue) && cheatValue > clicks) {
+                clicks = cheatValue;
+                countDisplay.textContent = "Clicks: " + clicks;
+                checkAdvancements();
+            }
+            cheatInput.style.display = "none";
+            cheatInput.value = "";
+        }
+    </script>
+</body>
+</html>
