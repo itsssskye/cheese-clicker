@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,124 +6,155 @@
     <title>Cheese Clicker</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f7e49c;
-        }
-        .cheese {
-            font-size: 100px;
-            cursor: pointer;
+            background-color: #f8e8a0;
+            font-family: Arial, sans-serif;
             user-select: none;
-            position: relative;
         }
-        .cheese:hover {
+        #cheese {
+            font-size: 50px;
+            cursor: pointer;
+            display: inline-block;
+            margin: 50px;
+        }
+        #cheese:hover {
             transform: scale(1.1);
         }
-        #cheeseCount {
+        #counter {
             font-size: 24px;
-            margin: 10px;
+            margin: 20px;
         }
-        .advancements-popup {
+        #advancements-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ffcc00;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 10px;
+        }
+        #advancements-btn:hover {
+            background-color: #ffdb4d;
+        }
+        #advancements-popup {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #f4d35e;
+            background-color: #f8e8a0;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+        }
+        .advancement {
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        .unlocked {
+            opacity: 1;
+        }
+        #cheat-code {
+            display: none;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 5px;
+            border: 2px solid #ffcc00;
+            background: white;
+            border-radius: 5px;
         }
         .notification {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background-color: #ffcc00;
+            background: #ffcc00;
             padding: 10px;
             border-radius: 5px;
             display: none;
         }
-        .cheat-input {
-            display: block;
-            margin: 20px auto;
-            padding: 5px;
-            font-size: 18px;
-            width: 100px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
-    <h1>🧀 Cheese Clicker 🧀</h1>
-    <input type="number" id="cheatCode" class="cheat-input" placeholder="Cheat Code">
-    <div class="cheese" onclick="clickCheese()">🧀</div>
-    <p id="cheeseCount">Cheese: 0</p>
-    <button onclick="showAdvancements()">Advancements</button>
-    <div class="advancements-popup" id="advPopup">
+    <h1 onclick="showCheatInput()">🧀 Cheese Clicker 🧀</h1>
+    <input type="number" id="cheat-code" placeholder="Enter clicks..." onkeypress="handleCheat(event)">
+    <div id="cheese" onclick="increment()">🧀</div>
+    <div id="counter">Clicks: 0</div>
+    <button id="advancements-btn" onclick="toggleAdvancements()">Advancements</button>
+    <div id="advancements-popup">
         <h2>Advancements</h2>
-        <p id="advList">None yet</p>
-        <button onclick="hideAdvancements()">Close</button>
+        <div id="adv-list"></div>
     </div>
-    <div class="notification" id="notification">New Advancement!</div>
-    <audio id="notifSound" src="https://www.myinstants.com/media/sounds/tiny-button-push.mp3"></audio>
-    
+    <div class="notification" id="notification">New Advancement Unlocked!</div>
     <script>
-        let cheese = 0;
-        let advancements = [
-            { clicks: 50, name: "Novice Cheeser", desc: "You're getting the hang of it!" },
-            { clicks: 100, name: "Better Cheeser", desc: "Cheese mastery is near!" },
-            { clicks: 250, name: "Cheese Enthusiast", desc: "Cheese obsession growing!" },
-            { clicks: 500, name: "Master Cheeser", desc: "Unstoppable cheesing!" },
-            { clicks: 1000, name: "Cheese Lord", desc: "Your cheese empire expands!" },
-            { clicks: 5000, name: "Supreme Cheese Overlord", desc: "Cheese domination!" },
-            { clicks: 10000, name: "Cheese God", desc: "You have reached cheese enlightenment!" }
-        ];
-        let unlocked = [];
+        let clicks = 0;
+        let advancements = {
+            50: "Novice Cheeser",
+            100: "Better Cheeser",
+            250: "Advanced Cheeser",
+            500: "Cheese Master",
+            1000: "Cheese Legend",
+            10000: "Supreme Cheese Overlord"
+        };
+        let unlocked = {};
 
-        function clickCheese() {
-            cheese++;
-            document.getElementById("cheeseCount").innerText = "Cheese: " + cheese;
+        function increment() {
+            clicks++;
+            document.getElementById("counter").textContent = "Clicks: " + clicks;
             checkAdvancements();
         }
-        
+
         function checkAdvancements() {
-            advancements.forEach(adv => {
-                if (cheese >= adv.clicks && !unlocked.includes(adv.name)) {
-                    unlocked.push(adv.name);
-                    showNotification(adv.name);
+            for (let key in advancements) {
+                if (clicks >= key && !unlocked[key]) {
+                    unlocked[key] = true;
+                    updateAdvancements();
+                    showNotification("Unlocked: " + advancements[key]);
                 }
-            });
-        }
-        
-        function showAdvancements() {
-            let advText = "";
-            advancements.forEach(adv => {
-                advText += unlocked.includes(adv.name) ? `✅ ${adv.name} - ${adv.desc}<br>` : `❌ ??? - ???<br>`;
-            });
-            document.getElementById("advList").innerHTML = advText;
-            document.getElementById("advPopup").style.display = "block";
-        }
-        
-        function hideAdvancements() {
-            document.getElementById("advPopup").style.display = "none";
-        }
-        
-        function showNotification(name) {
-            let notif = document.getElementById("notification");
-            notif.innerText = "New Advancement: " + name;
-            notif.style.display = "block";
-            document.getElementById("notifSound").play();
-            setTimeout(() => notif.style.display = "none", 3000);
+            }
         }
 
-        document.getElementById("cheatCode").addEventListener("change", function() {
-            let cheatValue = parseInt(this.value);
-            if (!isNaN(cheatValue)) {
-                cheese = cheatValue;
-                document.getElementById("cheeseCount").innerText = "Cheese: " + cheese;
-                checkAdvancements();
+        function updateAdvancements() {
+            let list = document.getElementById("adv-list");
+            list.innerHTML = "";
+            for (let key in advancements) {
+                let div = document.createElement("div");
+                div.textContent = advancements[key] + " (" + key + " clicks)";
+                div.className = unlocked[key] ? "advancement unlocked" : "advancement";
+                list.appendChild(div);
             }
-        });
+        }
+
+        function toggleAdvancements() {
+            let popup = document.getElementById("advancements-popup");
+            popup.style.display = popup.style.display === "none" || popup.style.display === "" ? "block" : "none";
+        }
+
+        function showNotification(message) {
+            let notification = document.getElementById("notification");
+            notification.textContent = message;
+            notification.style.display = "block";
+            setTimeout(() => { notification.style.display = "none"; }, 3000);
+        }
+
+        function showCheatInput() {
+            let input = document.getElementById("cheat-code");
+            input.style.display = "block";
+            input.focus();
+        }
+
+        function handleCheat(event) {
+            if (event.key === "Enter") {
+                let value = parseInt(event.target.value);
+                if (!isNaN(value) && value >= 0) {
+                    clicks = value;
+                    document.getElementById("counter").textContent = "Clicks: " + clicks;
+                    checkAdvancements();
+                }
+                event.target.style.display = "none";
+            }
+        }
     </script>
 </body>
-</html>
+</html>"
