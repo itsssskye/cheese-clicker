@@ -7,173 +7,144 @@
     <style>
         body {
             text-align: center;
-            background-color: #fceabb;
+            background-color: #ffeb99;
             font-family: Arial, sans-serif;
-            user-select: none;
-        }
-        h1 {
-            font-size: 36px;
-            position: relative;
-            display: inline-block;
-        }
-        .cheese-icon {
-            font-size: 36px;
-            cursor: pointer;
-            margin: 0 10px;
         }
         #cheese {
-            font-size: 100px;
+            font-size: 50px;
             cursor: pointer;
+            user-select: none;
             transition: transform 0.1s ease-in-out;
         }
         #cheese:hover {
             transform: scale(1.1);
         }
-        #cheese:not(:hover) {
-            transform: scale(1);
-        }
         #counter {
             font-size: 24px;
         }
-        #advancementButton {
-            margin-top: 20px;
-            padding: 10px 20px;
-            border-radius: 10px;
+        #advancements-btn {
             background-color: #ffcc00;
             border: none;
+            padding: 10px;
+            border-radius: 15px;
             cursor: pointer;
+            margin-top: 10px;
         }
-        #advancementsPopup {
+        #advancements-popup {
             display: none;
-            position: fixed;
-            top: 50%;
+            position: absolute;
             left: 50%;
+            top: 50%;
             transform: translate(-50%, -50%);
-            background-color: #f8d775;
+            background: #ffee88;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
         }
         .advancement {
-            padding: 5px;
-            margin: 5px 0;
-            border-radius: 5px;
-            background-color: gray;
+            opacity: 0.5;
         }
         .unlocked {
-            background-color: gold;
+            opacity: 1;
         }
-        #cheatBar {
+        #cheat-bar {
             display: none;
             margin-top: 10px;
             padding: 5px;
-            border: 2px solid #333;
-            border-radius: 5px;
+            border: 2px solid #ffcc00;
+            background: #fff8c6;
         }
-        .notification {
+        #notification {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: gold;
+            bottom: 10px;
+            right: 10px;
+            background: #ffcc00;
             padding: 10px;
-            border-radius: 5px;
+            border-radius: 10px;
             display: none;
         }
     </style>
 </head>
 <body>
     <h1>
-        <span class="cheese-icon" onclick="toggleCheatBar()">🧀</span>
+        <span id="cheese-left">🧀</span>
         Cheese Clicker
-        <span class="cheese-icon" onclick="toggleCheatBar()">🧀</span>
+        <span id="cheese-right">🧀</span>
     </h1>
-    <br>
-    <span id="counter">0 Cheeses</span>
-    <br>
-    <span id="cheese" onclick="incrementCheese()">🧀</span>
-    <br>
-    <input type="number" id="cheatBar" placeholder="Enter cheese count" onkeypress="handleCheat(event)">
-    <br>
-    <button id="advancementButton" onclick="toggleAdvancements()">Advancements</button>
-    <div id="advancementsPopup"></div>
-    <div id="notification" class="notification"></div>
-    <audio id="notifSound" src="notification.wav"></audio>
+    <input type="number" id="cheat-bar" placeholder="Enter cheese count" onkeydown="if(event.key==='Enter') applyCheat()">
+    <div id="counter">Cheese: 0</div>
+    <div id="cheese" onclick="incrementCheese()">🧀</div>
+    <button id="advancements-btn" onclick="toggleAdvancements()">Advancements</button>
+    <div id="advancements-popup">
+        <h2>Advancements</h2>
+        <ul>
+            <li id="adv-50" class="advancement">??? - Click 50 times</li>
+            <li id="adv-100" class="advancement">??? - Click 100 times</li>
+            <li id="adv-250" class="advancement">??? - Click 250 times</li>
+            <li id="adv-500" class="advancement">??? - Click 500 times</li>
+            <li id="adv-1000" class="advancement">??? - Click 1000 times</li>
+        </ul>
+    </div>
+    <div id="notification"></div>
+    <audio id="notif-sound" src="notification.wav"></audio>
     <script>
         let cheeseCount = 0;
-        let unlockedAdvancements = [];
-        const advancements = [
-            { count: 50, name: "Novice Cheeser", description: "Clicked 50 times." },
-            { count: 100, name: "Better Cheeser", description: "Clicked 100 times." },
-            { count: 250, name: "Advanced Cheeser", description: "Clicked 250 times." },
-            { count: 500, name: "Master Cheeser", description: "Clicked 500 times." },
-            { count: 1000, name: "Legendary Cheeser", description: "Clicked 1000 times." },
-            { count: 10000, name: "Ultimate Cheeser", description: "Clicked 10000 times." }
-        ];
+        let advancements = {
+            50: { unlocked: false, name: "Novice Cheeser", desc: "You have taken your first bite!" },
+            100: { unlocked: false, name: "Better Cheeser", desc: "You’re getting the hang of it!" },
+            250: { unlocked: false, name: "Cheese Enthusiast", desc: "Cheese is now your passion." },
+            500: { unlocked: false, name: "Cheese Addict", desc: "You may need help..." },
+            1000: { unlocked: false, name: "Cheese Overlord", desc: "Bow before the dairy king!" }
+        };
 
         function incrementCheese() {
             cheeseCount++;
-            document.getElementById("counter").innerText = cheeseCount + " Cheeses";
+            document.getElementById("counter").innerText = `Cheese: ${cheeseCount}`;
             checkAdvancements();
         }
 
         function checkAdvancements() {
-            advancements.forEach(a => {
-                if (cheeseCount >= a.count && !unlockedAdvancements.includes(a.name)) {
-                    unlockedAdvancements.push(a.name);
-                    showNotification(a.name);
+            for (let key in advancements) {
+                if (!advancements[key].unlocked && cheeseCount >= key) {
+                    advancements[key].unlocked = true;
+                    let advElement = document.getElementById(`adv-${key}`);
+                    advElement.innerText = `${advancements[key].name} - ${advancements[key].desc}`;
+                    advElement.classList.add("unlocked");
+                    showNotification(advancements[key].name);
                 }
-            });
+            }
         }
 
         function toggleAdvancements() {
-            let popup = document.getElementById("advancementsPopup");
-            if (popup.style.display === "none" || popup.style.display === "") {
-                popup.style.display = "block";
-                renderAdvancements();
-            } else {
-                popup.style.display = "none";
-            }
-        }
-
-        function renderAdvancements() {
-            let popup = document.getElementById("advancementsPopup");
-            popup.innerHTML = "<h2>Advancements</h2>";
-            advancements.forEach(a => {
-                let div = document.createElement("div");
-                div.classList.add("advancement");
-                if (unlockedAdvancements.includes(a.name)) {
-                    div.classList.add("unlocked");
-                    div.innerText = `${a.name} - ${a.description}`;
-                } else {
-                    div.innerText = "???";
-                }
-                popup.appendChild(div);
-            });
-        }
-
-        function toggleCheatBar() {
-            let cheatBar = document.getElementById("cheatBar");
-            cheatBar.style.display = cheatBar.style.display === "none" || cheatBar.style.display === "" ? "block" : "none";
-        }
-
-        function handleCheat(event) {
-            if (event.key === "Enter") {
-                let value = parseInt(event.target.value);
-                if (!isNaN(value)) {
-                    cheeseCount = value;
-                    document.getElementById("counter").innerText = cheeseCount + " Cheeses";
-                    checkAdvancements();
-                }
-                event.target.value = "";
-            }
+            let popup = document.getElementById("advancements-popup");
+            popup.style.display = popup.style.display === "none" ? "block" : "none";
         }
 
         function showNotification(text) {
             let notification = document.getElementById("notification");
-            notification.innerText = `Unlocked: ${text}`;
+            notification.innerText = text;
             notification.style.display = "block";
-            document.getElementById("notifSound").play();
-            setTimeout(() => { notification.style.display = "none"; }, 3000);
+            document.getElementById("notif-sound").play();
+            setTimeout(() => notification.style.display = "none", 3000);
+        }
+
+        document.getElementById("cheese-left").onclick = showCheatBar;
+        document.getElementById("cheese-right").onclick = showCheatBar;
+
+        function showCheatBar() {
+            let cheatBar = document.getElementById("cheat-bar");
+            cheatBar.style.display = "block";
+            cheatBar.focus();
+        }
+
+        function applyCheat() {
+            let cheatBar = document.getElementById("cheat-bar");
+            let value = parseInt(cheatBar.value);
+            if (!isNaN(value)) {
+                cheeseCount = value;
+                document.getElementById("counter").innerText = `Cheese: ${cheeseCount}`;
+                checkAdvancements();
+            }
+            cheatBar.style.display = "none";
         }
     </script>
 </body>
