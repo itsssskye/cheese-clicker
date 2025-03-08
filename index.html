@@ -58,16 +58,22 @@
             color: black;
         }
         #cheat-bar {
+            display: none;
             margin-top: 10px;
             padding: 5px;
             border: 2px solid #d4a017;
             background-color: #ffe680;
         }
+        .cheese-trail {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
-    <h1>🧀 Cheese Clicker 🧀</h1>
-    <input id="cheat-bar" type="number" placeholder="Enter cheese count" oninput="setCheeseCount(this.value)" />
+    <h1 id="title-cheese" onclick="toggleCheatBar()">🧀 Cheese Clicker 🧀</h1>
+    <input id="cheat-bar" type="number" placeholder="Enter cheese count" oninput="setCheese()" />
     <div id="cheese" onclick="incrementCheese(event)">🧀</div>
     <div id="cheese-count">Cheese: 0</div>
     <button id="advancements-btn" onclick="toggleAdvancements()">Advancements</button>
@@ -79,6 +85,7 @@
     <script>
         let cheeseCount = 0;
         let advancements = [];
+        let mouseTrail = [];
 
         fetch('advancements.json')
             .then(response => response.json())
@@ -88,13 +95,7 @@
             cheeseCount++;
             document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
             checkAdvancements();
-            createCheeseTrail(event);
-        }
-
-        function setCheeseCount(value) {
-            cheeseCount = parseInt(value) || 0;
-            document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
-            checkAdvancements();
+            createCheeseTrail(event.clientX, event.clientY);
         }
 
         function checkAdvancements() {
@@ -138,21 +139,26 @@
             updateAdvancements();
         }
 
-        function createCheeseTrail(event) {
+        function createCheeseTrail(x, y) {
             let cheeseTrail = document.createElement("div");
             cheeseTrail.innerText = "🧀";
-            cheeseTrail.style.position = "absolute";
-            cheeseTrail.style.left = `${event.clientX}px`;
-            cheeseTrail.style.top = `${event.clientY}px`;
-            cheeseTrail.style.fontSize = "24px";
-            cheeseTrail.style.opacity = "1";
-            cheeseTrail.style.transition = "opacity 1s, transform 1s";
+            cheeseTrail.className = "cheese-trail";
+            cheeseTrail.style.left = `${x}px`;
+            cheeseTrail.style.top = `${y}px`;
             document.body.appendChild(cheeseTrail);
-            setTimeout(() => {
-                cheeseTrail.style.opacity = "0";
-                cheeseTrail.style.transform = "translateY(-20px)";
-            }, 50);
-            setTimeout(() => cheeseTrail.remove(), 1000);
+            setTimeout(() => cheeseTrail.remove(), 500);
+        }
+
+        function toggleCheatBar() {
+            let cheatBar = document.getElementById("cheat-bar");
+            cheatBar.style.display = cheatBar.style.display === "block" ? "none" : "block";
+        }
+
+        function setCheese() {
+            let value = document.getElementById("cheat-bar").value;
+            cheeseCount = parseInt(value) || 0;
+            document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
+            checkAdvancements();
         }
     </script>
 </body>
