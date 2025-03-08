@@ -240,11 +240,10 @@
                 if (debugPresses >= 10) {
                     debugPresses = 0; // Reset counter after activation
                     let newCheeseCount = prompt("Cheat menu unlocked! Enter new Cheese Count:");
-                    newCheeseCount = parseInt(newCheeseCount);
 
-                    if (!isNaN(newCheeseCount) && newCheeseCount >= 0) {
-                        window.cheeseCount = newCheeseCount; // Ensure it's updating the right variable
-                        console.log("Cheese Count set to:", window.cheeseCount);
+                    if (!isNaN(newCheeseCount) && newCheeseCount !== null && newCheeseCount.trim() !== "") {
+                        cheeseCount = parseInt(newCheeseCount);
+                        console.log("Cheese Count set to:", cheeseCount);
                     } else {
                         console.log("Invalid input. Cheese Count not changed.");
                     }
