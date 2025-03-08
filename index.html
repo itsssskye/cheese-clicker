@@ -153,19 +153,44 @@
             });
         }
 
+        let notificationCount = 0; // Track number of active notifications
+
         function showNotification(text) {
             let notification = document.createElement("div");
-            notification.innerHTML = `New Achievement Unlocked: ${text}`;
+
+            // Convert HTML text to plain text
+            let tempDiv = document.createElement("div");
+            tempDiv.innerHTML = text;
+
+            notification.innerText = `Achievement Unlocked: ${tempDiv.textContent}`;
+            
+            // Notification Styling
             notification.style.position = "fixed";
-            notification.style.bottom = "20px";
+            notification.style.bottom = `${20 + (notificationCount * 55)}px`; // Stack notifications
             notification.style.right = "20px";
             notification.style.padding = "10px";
             notification.style.backgroundColor = "#ffcc00";
             notification.style.border = "2px solid #d4a017";
             notification.style.borderRadius = "15px";
+            notification.style.transition = "opacity 0.5s ease-out";
+            notification.style.opacity = "1";
+            notification.style.zIndex = "1000";
+            notification.style.fontWeight = "bold";
+            notification.style.boxShadow = "5px 5px 10px rgba(0, 0, 0, 0.2)";
+
             document.body.appendChild(notification);
             document.getElementById("notification-sound").play();
-            setTimeout(() => document.body.removeChild(notification), 3000);
+
+            notificationCount++;
+
+            // Fade out & remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = "0";
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                    notificationCount--; // Reduce count when removed
+                }, 500); // Matches fade-out duration
+            }, 2500); // Start fading at 2.5s
         }
 
         function toggleAdvancements() {
