@@ -57,20 +57,10 @@
         .unlocked {
             color: black;
         }
-        .cheese-trail {
-            position: absolute;
-            font-size: 24px;
-            pointer-events: none;
-            animation: fadeOut 1s forwards;
-        }
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
-        }
     </style>
 </head>
 <body>
-    <h1 id="title">🧀 Cheese Clicker 🧀</h1>
+    <h1>🧀 Cheese Clicker 🧀</h1>
     <div id="cheese" onclick="incrementCheese(event)">🧀</div>
     <div id="cheese-count">Cheese: 0</div>
     <button id="advancements-btn" onclick="toggleAdvancements()">Advancements</button>
@@ -81,15 +71,14 @@
     <audio id="notification-sound" src="notification.wav"></audio>
     <script>
         let cheeseCount = 0;
-        let advancements = [];
-        let keyPresses = 0;
-
-        fetch('advancements.json')
-            .then(response => response.json())
-            .then(data => {
-                advancements = data.map(a => ({ ...a, unlocked: false }));
-                updateAdvancements();
-            });
+        let advancements = [
+            { name: "Tiny Cheeser", clicks: 10, description: "You took your first nibble.", unlocked: false },
+            { name: "Crumb Cheeser", clicks: 50, description: "You’re gathering the crumbs of greatness.", unlocked: false },
+            { name: "Little Cheeser", clicks: 100, description: "You’re a small but mighty cheeser.", unlocked: false },
+            { name: "Mini Dairy Dabbler", clicks: 150, description: "Just a little dairy adventurer.", unlocked: false },
+            { name: "Cheese Fanatic", clicks: 250, description: "Your love for cheese is growing!", unlocked: false }
+        ];
+        let debugCounter = 0;
 
         function incrementCheese(event) {
             cheeseCount++;
@@ -100,7 +89,7 @@
 
         function checkAdvancements() {
             advancements.forEach(a => {
-                if (!a.unlocked && cheeseCount >= a.requirement) {
+                if (!a.unlocked && cheeseCount >= a.clicks) {
                     a.unlocked = true;
                     showNotification(a.name);
                 }
@@ -114,7 +103,7 @@
             advancements.forEach(a => {
                 let div = document.createElement("div");
                 div.className = a.unlocked ? "unlocked" : "advancement";
-                div.innerText = a.unlocked ? `${a.name}: ${a.desc}` : "???";
+                div.innerText = a.unlocked ? `${a.name}: ${a.description}` : "???";
                 list.appendChild(div);
             });
         }
@@ -142,27 +131,27 @@
         function createCheeseTrail(event) {
             let cheeseTrail = document.createElement("div");
             cheeseTrail.innerText = "🧀";
-            cheeseTrail.className = "cheese-trail";
+            cheeseTrail.style.position = "absolute";
+            cheeseTrail.style.left = `${event.clientX}px`;
+            cheeseTrail.style.top = `${event.clientY}px`;
+            cheeseTrail.style.fontSize = "24px";
+            cheeseTrail.style.pointerEvents = "none";
             document.body.appendChild(cheeseTrail);
-            let x = event.clientX;
-            let y = event.clientY;
-            cheeseTrail.style.left = `${x}px`;
-            cheeseTrail.style.top = `${y}px`;
             setTimeout(() => cheeseTrail.remove(), 1000);
         }
 
         document.addEventListener("keydown", function(event) {
-            if (event.key.toLowerCase() === "d") {
-                keyPresses++;
-                if (keyPresses >= 10) {
-                    let input = prompt("Enter new cheese count:");
-                    if (!isNaN(input) && input !== null) {
-                        cheeseCount = parseInt(input);
+            if (event.key === "d") {
+                debugCounter++;
+                if (debugCounter >= 10) {
+                    let newCheese = prompt("Enter cheese count:");
+                    if (newCheese !== null && !isNaN(newCheese)) {
+                        cheeseCount = parseInt(newCheese);
                         document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
+                        checkAdvancements();
                     }
-                    keyPresses = 0;
+                    debugCounter = 0;
                 }
-                setTimeout(() => keyPresses = 0, 2000);
             }
         });
     </script>
