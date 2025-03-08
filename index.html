@@ -227,20 +227,27 @@
         }
 
         let debugPresses = 0;
+        let debugTimer;
 
         document.addEventListener("keydown", function(event) {
             if (event.key.toLowerCase() === "d") {
                 debugPresses++;
+
+                // Reset the counter if no "D" is pressed within 1 second
+                clearTimeout(debugTimer);
+                debugTimer = setTimeout(() => debugPresses = 0, 1000);
+
                 if (debugPresses >= 10) {
+                    debugPresses = 0; // Reset counter after activation
                     let newCheeseCount = prompt("Cheat menu unlocked! Enter new Cheese Count:");
                     newCheeseCount = parseInt(newCheeseCount);
+
                     if (!isNaN(newCheeseCount) && newCheeseCount >= 0) {
-                        cheeseCount = newCheeseCount;
-                        console.log("Cheese Count set to:", cheeseCount);
+                        window.cheeseCount = newCheeseCount; // Ensure it's updating the right variable
+                        console.log("Cheese Count set to:", window.cheeseCount);
                     } else {
                         console.log("Invalid input. Cheese Count not changed.");
                     }
-                    debugPresses = 0; // Reset the counter
                 }
             }
         });
