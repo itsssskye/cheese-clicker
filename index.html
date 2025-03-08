@@ -125,13 +125,14 @@
         ];
         let debugCounter = 0;
 
+        //Increases the cheese count
         function incrementCheese(event) {
             cheeseCount++;
             document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
             checkAdvancements();
-            createCheeseTrail(event);
         }
 
+        // Check the advancements
         function checkAdvancements() {
             advancements.forEach(a => {
                 if (!a.unlocked && cheeseCount >= a.clicks) {
@@ -142,6 +143,7 @@
             updateAdvancements();
         }
 
+        // Updates the advancements
         function updateAdvancements() {
             let list = document.getElementById("advancements-list");
             list.innerHTML = "";
@@ -199,6 +201,31 @@
             updateAdvancements();
         }
 
+        // Save cheese count & unlocked achievements to localStorage
+        function saveGameData() {
+            localStorage.setItem("cheeseCount", cheeseCount);
+            localStorage.setItem("unlockedAchievements", JSON.stringify(unlockedAchievements));
+        }
+
+        // Load saved data from localStorage
+        function loadGameData() {
+            let savedCheese = localStorage.getItem("cheeseCount");
+            let savedAchievements = localStorage.getItem("unlockedAchievements");
+
+            if (savedCheese !== null) {
+                cheeseCount = parseInt(savedCheese);
+                document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
+            }
+
+            if (savedAchievements !== null) {
+                unlockedAchievements = JSON.parse(savedAchievements);
+            }
+        }
+
+        // Call this when the page loads
+        loadGameData();
+
+        // Debugging: Press 'd' 10 times to add cheese
         document.addEventListener("keydown", function(event) {
             if (event.key === "d") {
                 debugCounter++;
