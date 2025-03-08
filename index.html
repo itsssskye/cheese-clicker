@@ -6,46 +6,73 @@
     <title>Cheese Clicker</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             text-align: center;
-        }
-        #cheeseContainer {
-            display: inline-block;
-            position: relative;
-            width: 150px;
-            height: 150px;
+            background-color: #f7e7a2;
+            font-family: Arial, sans-serif;
+            user-select: none;
         }
         #cheese {
-            width: 100px;
-            height: 100px;
+            font-size: 100px;
             cursor: pointer;
+            transition: transform 0.1s;
+            position: relative;
         }
-        #advancements {
+        #cheese:hover {
+            transform: scale(1.1);
+        }
+        #cheese:active {
+            transform: scale(0.9);
+        }
+        #cheese-count {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        #advancements-btn {
             margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            background-color: #ffcc00;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        #advancements-popup {
+            display: none;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f7d774;
+            border: 2px solid #d4a017;
+            padding: 20px;
+            width: 50%;
+            max-width: 400px;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
             text-align: left;
-            display: inline-block;
+            margin-top: 10px;
+            border-radius: 15px;
         }
-        .locked {
-            opacity: 0.5;
-            font-style: italic;
+        .advancement {
+            color: gray;
         }
-        .bold {
-            font-weight: bold;
+        .unlocked {
+            color: black;
         }
     </style>
 </head>
 <body>
-    <h1>Cheese Clicker</h1>
-    <div id="cheeseContainer">
-        <img id="cheese" src="cheese.png" alt="Cheese">
+    <h1>🧀 Cheese Clicker 🧀</h1>
+    <div id="cheese" onclick="incrementCheese(event)">🧀</div>
+    <div id="cheese-count">Cheese: 0</div>
+    <button id="advancements-btn" onclick="toggleAdvancements()">Advancements</button>
+    <div id="advancements-popup">
+        <h3>Advancements</h3>
+        <div id="advancements-list"></div>
     </div>
-    <p>Cheese Count: <span id="cheeseCount">0</span></p>
-    <div id="advancements"></div>
-
+    <audio id="notification-sound" src="notification.wav"></audio>
     <script>
         let cheeseCount = 0;
         let advancements = [
-    { name: "<b/>Tiny Cheeser", clicks: 10, description: "You took your first nibble." },
+    { name: "Tiny Cheeser", clicks: 10, description: "You took your first nibble." },
     { name: "Crumb Cheeser", clicks: 50, description: "You’re gathering the crumbs of greatness." },
     { name: "Little Cheeser", clicks: 100, description: "You’re a small but mighty cheeser." },
     { name: "Mini Dairy Dabbler", clicks: 150, description: "Just a little dairy adventurer." },
@@ -96,25 +123,81 @@
     { name: "The Lactose Creator", clicks: 95000000, description: "You invented milk itself." },
     { name: "THE BIGGEST CHEESER", clicks: 100000000, description: "There is no cheese beyond you. YOU ARE CHEESE." }
 ];
-        
+        let debugCounter = 0;
+
+        function incrementCheese(event) {
+            cheeseCount++;
+            document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
+            checkAdvancements();
+            createCheeseTrail(event);
+        }
+
+        function checkAdvancements() {
+            advancements.forEach(a => {
+                if (!a.unlocked && cheeseCount >= a.clicks) {
+                    a.unlocked = true;
+                    showNotification(a.name);
+                }
+            });
+            updateAdvancements();
+        }
+
         function updateAdvancements() {
-            let advancementsDiv = document.getElementById("advancements");
-            advancementsDiv.innerHTML = "<h2>Advancements</h2>";
-            advancements.forEach(adv => {
-                let isUnlocked = cheeseCount >= adv.clicks;
-                let advancementText = isUnlocked ? `${adv.name}: ${adv.description}` : "???";
-                let advancementClass = isUnlocked ? "" : "locked";
-                let p = document.createElement("p");
-                p.innerHTML = advancementText;
-                p.className = advancementClass;
-                advancementsDiv.appendChild(p);
+            let list = document.getElementById("advancements-list");
+            list.innerHTML = "";
+            advancements.forEach(a => {
+                let div = document.createElement("div");
+                div.className = a.unlocked ? "unlocked" : "advancement";
+                div.innerText = a.unlocked ? `${a.name}: ${a.description}` : "???";
+                list.appendChild(div);
             });
         }
 
-        document.getElementById("cheese").addEventListener("click", function() {
-            cheeseCount++;
-            document.getElementById("cheeseCount").textContent = cheeseCount;
+        function showNotification(text) {
+            let notification = document.createElement("div");
+            notification.innerText = `Achievement Unlocked: ${text}`;
+            notification.style.position = "fixed";
+            notification.style.bottom = "20px";
+            notification.style.right = "20px";
+            notification.style.padding = "10px";
+            notification.style.backgroundColor = "#ffcc00";
+            notification.style.border = "2px solid #d4a017";
+            document.body.appendChild(notification);
+            document.getElementById("notification-sound").play();
+            setTimeout(() => document.body.removeChild(notification), 3000);
+        }
+
+        function toggleAdvancements() {
+            let popup = document.getElementById("advancements-popup");
+            popup.style.display = popup.style.display === "block" ? "none" : "block";
             updateAdvancements();
+        }
+
+        function createCheeseTrail(event) {
+            let cheeseTrail = document.createElement("div");
+            cheeseTrail.innerText = "🧀";
+            cheeseTrail.style.position = "absolute";
+            cheeseTrail.style.left = `${event.clientX}px`;
+            cheeseTrail.style.top = `${event.clientY}px`;
+            cheeseTrail.style.fontSize = "24px";
+            cheeseTrail.style.pointerEvents = "none";
+            document.body.appendChild(cheeseTrail);
+            setTimeout(() => cheeseTrail.remove(), 1000);
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "d") {
+                debugCounter++;
+                if (debugCounter >= 10) {
+                    let newCheese = prompt("Enter cheese count:");
+                    if (newCheese !== null && !isNaN(newCheese)) {
+                        cheeseCount = parseInt(newCheese);
+                        document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
+                        checkAdvancements();
+                    }
+                    debugCounter = 0;
+                }
+            }
         });
     </script>
 </body>
