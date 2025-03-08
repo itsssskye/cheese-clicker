@@ -10,7 +10,6 @@
             background-color: #f7e7a2;
             font-family: Arial, sans-serif;
             user-select: none;
-            overflow: hidden;
         }
         #cheese {
             font-size: 100px;
@@ -58,20 +57,17 @@
         .unlocked {
             color: black;
         }
-        .cheese-trail {
-            position: absolute;
-            font-size: 24px;
-            pointer-events: none;
-            animation: fadeOut 1s linear forwards;
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-20px); }
+        #cheat-bar {
+            margin-top: 10px;
+            padding: 5px;
+            border: 2px solid #d4a017;
+            background-color: #ffe680;
         }
     </style>
 </head>
 <body>
     <h1>🧀 Cheese Clicker 🧀</h1>
+    <input id="cheat-bar" type="number" placeholder="Enter cheese count" oninput="setCheeseCount(this.value)" />
     <div id="cheese" onclick="incrementCheese(event)">🧀</div>
     <div id="cheese-count">Cheese: 0</div>
     <button id="advancements-btn" onclick="toggleAdvancements()">Advancements</button>
@@ -92,7 +88,13 @@
             cheeseCount++;
             document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
             checkAdvancements();
-            createCheeseTrail(event.clientX, event.clientY);
+            createCheeseTrail(event);
+        }
+
+        function setCheeseCount(value) {
+            cheeseCount = parseInt(value) || 0;
+            document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
+            checkAdvancements();
         }
 
         function checkAdvancements() {
@@ -136,13 +138,20 @@
             updateAdvancements();
         }
 
-        function createCheeseTrail(x, y) {
+        function createCheeseTrail(event) {
             let cheeseTrail = document.createElement("div");
             cheeseTrail.innerText = "🧀";
-            cheeseTrail.className = "cheese-trail";
-            cheeseTrail.style.left = `${x}px`;
-            cheeseTrail.style.top = `${y}px`;
+            cheeseTrail.style.position = "absolute";
+            cheeseTrail.style.left = `${event.clientX}px`;
+            cheeseTrail.style.top = `${event.clientY}px`;
+            cheeseTrail.style.fontSize = "24px";
+            cheeseTrail.style.opacity = "1";
+            cheeseTrail.style.transition = "opacity 1s, transform 1s";
             document.body.appendChild(cheeseTrail);
+            setTimeout(() => {
+                cheeseTrail.style.opacity = "0";
+                cheeseTrail.style.transform = "translateY(-20px)";
+            }, 50);
             setTimeout(() => cheeseTrail.remove(), 1000);
         }
     </script>
