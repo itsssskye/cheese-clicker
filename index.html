@@ -37,20 +37,20 @@
             font-size: 18px;
         }
         #advancements-popup {
-        display: none;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #f7d774;
-        border: 3px solid #d4a017;
-        padding: 30px;
-        width: 75%;
-        max-width: 600px;
-        box-shadow: 7.5px 7.5px 15px rgba(0, 0, 0, 0.3);
-        text-align: left;
-        margin-top: 15px;
-        border-radius: 22.5px;
-    }
+            display: none;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f7d774;
+            border: 3px solid #d4a017;
+            padding: 30px;
+            width: 75%;
+            max-width: 600px;
+            box-shadow: 7.5px 7.5px 15px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            margin-top: 15px;
+            border-radius: 22.5px;
+        }
         .advancement {
             color: gray;
         }
@@ -123,52 +123,53 @@
             { name: "<b>The Lactose Creator</b>", clicks: 95000000, description: "You invented milk itself." },
             { name: "<b>THE ULTIMATELY POWERFUL AND DILIGENT AS WELL AS IMMORTAL CHEESER</b>", clicks: 100000000, description: "There is no cheese beyond you. YOU ARE CHEESE." }
         ];
-        let debugCounter = 0;
+        let unlockedAchievements = {}; // Stores unlocked achievements
+        let notificationCount = 0; // Tracks active notifications
 
-        //Increases the cheese count
+        // Increase the cheese count when clicked
         function incrementCheese(event) {
             cheeseCount++;
             document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
             checkAdvancements();
+            saveGameData(); // Save progress
         }
 
-        // Check the advancements
+        // Check if an achievement is unlocked
         function checkAdvancements() {
             advancements.forEach(a => {
-                if (!a.unlocked && cheeseCount >= a.clicks) {
-                    a.unlocked = true;
+                if (!unlockedAchievements[a.name] && cheeseCount >= a.clicks) {
+                    unlockedAchievements[a.name] = true;
                     showNotification(a.name);
                 }
             });
             updateAdvancements();
+            saveGameData(); // Save when unlocking an advancement
         }
 
-        // Updates the advancements
+        // Update the advancements list
         function updateAdvancements() {
             let list = document.getElementById("advancements-list");
             list.innerHTML = "";
             advancements.forEach(a => {
                 let div = document.createElement("div");
-                div.className = a.unlocked ? "unlocked" : "advancement";
-                div.innerHTML = a.unlocked ? `${a.name}: ${a.description}` : "???"; // Using innerHTML
+                div.className = unlockedAchievements[a.name] ? "unlocked" : "advancement";
+                div.innerHTML = unlockedAchievements[a.name] ? `${a.name}: ${a.description}` : "???";
                 list.appendChild(div);
             });
         }
 
-        let notificationCount = 0; // Track number of active notifications
-
+        // Show a notification for achievements
         function showNotification(text) {
             let notification = document.createElement("div");
 
-            // Convert HTML text to plain text
+            // Convert HTML to plain text
             let tempDiv = document.createElement("div");
             tempDiv.innerHTML = text;
-
             notification.innerText = `Achievement Unlocked: ${tempDiv.textContent}`;
             
-            // Notification Styling
+            // Style notification
             notification.style.position = "fixed";
-            notification.style.bottom = `${20 + (notificationCount * 55)}px`; // Stack notifications
+            notification.style.bottom = `${20 + (notificationCount * 55)}px`; // Stacks notifications
             notification.style.right = "20px";
             notification.style.padding = "10px";
             notification.style.backgroundColor = "#ffcc00";
@@ -185,16 +186,17 @@
 
             notificationCount++;
 
-            // Fade out & remove after 3 seconds
+            // Fade out and remove after 3 seconds
             setTimeout(() => {
                 notification.style.opacity = "0";
                 setTimeout(() => {
                     document.body.removeChild(notification);
                     notificationCount--; // Reduce count when removed
                 }, 500); // Matches fade-out duration
-            }, 2500); // Start fading at 2.5s
+            }, 2500);
         }
 
+        // Toggle the advancements menu
         function toggleAdvancements() {
             let popup = document.getElementById("advancements-popup");
             popup.style.display = popup.style.display === "block" ? "none" : "block";
@@ -220,26 +222,12 @@
             if (savedAchievements !== null) {
                 unlockedAchievements = JSON.parse(savedAchievements);
             }
+
+            updateAdvancements(); // Refresh achievements UI
         }
 
-        // Call this when the page loads
+        // Load saved game data when the page loads
         loadGameData();
-
-        // Debugging: Press 'd' 10 times to add cheese
-        document.addEventListener("keydown", function(event) {
-            if (event.key === "d") {
-                debugCounter++;
-                if (debugCounter >= 10) {
-                    let newCheese = prompt("Enter cheese count:");
-                    if (newCheese !== null && !isNaN(newCheese)) {
-                        cheeseCount = parseInt(newCheese);
-                        document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
-                        checkAdvancements();
-                    }
-                    debugCounter = 0;
-                }
-            }
-        });
     </script>
 </body>
 </html>
