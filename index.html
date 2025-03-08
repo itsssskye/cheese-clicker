@@ -15,6 +15,7 @@
             font-size: 100px;
             cursor: pointer;
             transition: transform 0.1s;
+            position: relative;
         }
         #cheese:hover {
             transform: scale(1.1);
@@ -48,6 +49,7 @@
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
             text-align: left;
             margin-top: 10px;
+            border-radius: 15px;
         }
         .advancement {
             color: gray;
@@ -67,7 +69,7 @@
 <body>
     <h1>🧀 Cheese Clicker 🧀</h1>
     <input id="cheat-bar" type="number" placeholder="Enter cheese count" />
-    <div id="cheese" onclick="incrementCheese()">🧀</div>
+    <div id="cheese" onclick="incrementCheese(event)">🧀</div>
     <div id="cheese-count">Cheese: 0</div>
     <button id="advancements-btn" onclick="toggleAdvancements()">Advancements</button>
     <div id="advancements-popup">
@@ -77,16 +79,19 @@
     <audio id="notification-sound" src="notification.wav"></audio>
     <script>
         let cheeseCount = 0;
-        let advancements = [
-            { name: "Novice Cheeser", desc: "Clicked 50 times", requirement: 50, unlocked: false },
-            { name: "Better Cheeser", desc: "Clicked 100 times", requirement: 100, unlocked: false },
-            { name: "Master Cheeser", desc: "Clicked 500 times", requirement: 500, unlocked: false },
-        ];
-        function incrementCheese() {
+        let advancements = [];
+
+        fetch('advancements.json')
+            .then(response => response.json())
+            .then(data => { advancements = data; updateAdvancements(); });
+
+        function incrementCheese(event) {
             cheeseCount++;
             document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
             checkAdvancements();
+            createCheeseTrail(event);
         }
+
         function checkAdvancements() {
             advancements.forEach(a => {
                 if (!a.unlocked && cheeseCount >= a.requirement) {
@@ -96,6 +101,7 @@
             });
             updateAdvancements();
         }
+
         function updateAdvancements() {
             let list = document.getElementById("advancements-list");
             list.innerHTML = "";
@@ -106,6 +112,7 @@
                 list.appendChild(div);
             });
         }
+
         function showNotification(text) {
             let notification = document.createElement("div");
             notification.innerText = `Achievement Unlocked: ${text}`;
@@ -119,10 +126,22 @@
             document.getElementById("notification-sound").play();
             setTimeout(() => document.body.removeChild(notification), 3000);
         }
+
         function toggleAdvancements() {
             let popup = document.getElementById("advancements-popup");
             popup.style.display = popup.style.display === "block" ? "none" : "block";
             updateAdvancements();
+        }
+
+        function createCheeseTrail(event) {
+            let cheeseTrail = document.createElement("div");
+            cheeseTrail.innerText = "🧀";
+            cheeseTrail.style.position = "absolute";
+            cheeseTrail.style.left = `${event.clientX}px`;
+            cheeseTrail.style.top = `${event.clientY}px`;
+            cheeseTrail.style.fontSize = "24px";
+            document.body.appendChild(cheeseTrail);
+            setTimeout(() => cheeseTrail.remove(), 1000);
         }
     </script>
 </body>
