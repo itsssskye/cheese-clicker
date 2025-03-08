@@ -155,7 +155,7 @@
 
         function showNotification(text) {
             let notification = document.createElement("div");
-            notification.innerText = `Achievement Unlocked: ${text}`;
+            notification.innerHTML = `New Achievement Unlocked: ${text}`;
             notification.style.position = "fixed";
             notification.style.bottom = "20px";
             notification.style.right = "20px";
