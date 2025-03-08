@@ -10,6 +10,7 @@
             background-color: #f7e7a2;
             font-family: Arial, sans-serif;
             user-select: none;
+            overflow: hidden;
         }
         #cheese {
             font-size: 100px;
@@ -57,18 +58,20 @@
         .unlocked {
             color: black;
         }
-        #cheat-bar {
-            display: none;
-            margin-top: 10px;
-            padding: 5px;
-            border: 2px solid #d4a017;
-            background-color: #ffe680;
+        .cheese-trail {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            animation: fadeOut 1s linear forwards;
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
         }
     </style>
 </head>
 <body>
     <h1>🧀 Cheese Clicker 🧀</h1>
-    <input id="cheat-bar" type="number" placeholder="Enter cheese count" />
     <div id="cheese" onclick="incrementCheese(event)">🧀</div>
     <div id="cheese-count">Cheese: 0</div>
     <button id="advancements-btn" onclick="toggleAdvancements()">Advancements</button>
@@ -89,7 +92,7 @@
             cheeseCount++;
             document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
             checkAdvancements();
-            createCheeseTrail(event);
+            createCheeseTrail(event.clientX, event.clientY);
         }
 
         function checkAdvancements() {
@@ -133,13 +136,12 @@
             updateAdvancements();
         }
 
-        function createCheeseTrail(event) {
+        function createCheeseTrail(x, y) {
             let cheeseTrail = document.createElement("div");
             cheeseTrail.innerText = "🧀";
-            cheeseTrail.style.position = "absolute";
-            cheeseTrail.style.left = `${event.clientX}px`;
-            cheeseTrail.style.top = `${event.clientY}px`;
-            cheeseTrail.style.fontSize = "24px";
+            cheeseTrail.className = "cheese-trail";
+            cheeseTrail.style.left = `${x}px`;
+            cheeseTrail.style.top = `${y}px`;
             document.body.appendChild(cheeseTrail);
             setTimeout(() => cheeseTrail.remove(), 1000);
         }
