@@ -162,6 +162,7 @@
             notification.style.padding = "10px";
             notification.style.backgroundColor = "#ffcc00";
             notification.style.border = "2px solid #d4a017";
+            notification.style.borderRadius = "15px";
             document.body.appendChild(notification);
             document.getElementById("notification-sound").play();
             setTimeout(() => document.body.removeChild(notification), 3000);
@@ -171,18 +172,6 @@
             let popup = document.getElementById("advancements-popup");
             popup.style.display = popup.style.display === "block" ? "none" : "block";
             updateAdvancements();
-        }
-
-        function createCheeseTrail(event) {
-            let cheeseTrail = document.createElement("div");
-            cheeseTrail.innerText = "🧀";
-            cheeseTrail.style.position = "absolute";
-            cheeseTrail.style.left = `${event.clientX}px`;
-            cheeseTrail.style.top = `${event.clientY}px`;
-            cheeseTrail.style.fontSize = "24px";
-            cheeseTrail.style.pointerEvents = "none";
-            document.body.appendChild(cheeseTrail);
-            setTimeout(() => cheeseTrail.remove(), 1000);
         }
 
         document.addEventListener("keydown", function(event) {
