@@ -6,166 +6,199 @@
     <title>Cheese Clicker</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             text-align: center;
-        }
-        #cheeseContainer {
-            display: inline-block;
-            position: relative;
-            width: 150px;
-            height: 150px;
+            background-color: #f7e7a2;
+            font-family: Arial, sans-serif;
+            user-select: none;
         }
         #cheese {
-            width: 100px;
-            height: 100px;
+            font-size: 100px;
             cursor: pointer;
+            transition: transform 0.1s;
+            position: relative;
         }
-        .trail {
-            position: absolute;
-            height: 10px; 
-            width: 10px;
-            border-radius: 5px;
-            background: url('cheese.png'); 
-            background-size: cover;
+        #cheese:hover {
+            transform: scale(1.1);
         }
-        #advancements {
+        #cheese:active {
+            transform: scale(0.9);
+        }
+        #cheese-count {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        #advancements-btn {
             margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            background-color: #ffcc00;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        #advancements-popup {
+            display: none;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f7d774;
+            border: 2px solid #d4a017;
+            padding: 20px;
+            width: 50%;
+            max-width: 400px;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
             text-align: left;
-            display: inline-block;
+            margin-top: 10px;
+            border-radius: 15px;
         }
-        .locked {
-            opacity: 0.5;
-            font-style: italic;
+        .advancement {
+            color: gray;
         }
-        .bold {
-            font-weight: bold;
+        .unlocked {
+            color: black;
         }
     </style>
 </head>
 <body>
-    <h1>Cheese Clicker</h1>
-    <div id="cheeseContainer">
-        <img id="cheese" src="cheese.png" alt="Cheese">
+    <h1>🧀 Cheese Clicker 🧀</h1>
+    <div id="cheese" onclick="incrementCheese(event)">🧀</div>
+    <div id="cheese-count">Cheese: 0</div>
+    <button id="advancements-btn" onclick="toggleAdvancements()">Advancements</button>
+    <div id="advancements-popup">
+        <h3>Advancements</h3>
+        <div id="advancements-list"></div>
     </div>
-    <p>Cheese Count: <span id="cheeseCount">0</span></p>
-    <div id="advancements"></div>
-
+    <audio id="notification-sound" src="notification.wav"></audio>
     <script>
         let cheeseCount = 0;
-      
         let advancements = [
-            { name: "<b>Tiny Cheeser</b>", clicks: 10, description: "You took your first nibble." },
-            { name: "<b>Crumb Cheeser</b>", clicks: 50, description: "You’re gathering the crumbs of greatness." },
-            { name: "<b>Little Cheeser</b>", clicks: 100, description: "You’re a small but mighty cheeser." },
-            { name: "<b>Mini Dairy Dabbler</b>", clicks: 150, description: "Just a little dairy adventurer." },
-            { name: "<b>Cheese Fanatic</b>", clicks: 250, description: "Your love for cheese is growing!" },
-            { name: "<b>Stretchy Cheeser</b>", clicks: 500, description: "Mozzarella magic unlocked." },
-            { name: "<b>Novice Cheeser</b>", clicks: 750, description: "You’re taking cheese seriously now." },
-            { name: "<b>Swiss Starter</b>", clicks: 1000, description: "The holes in your knowledge are filling up." },
-            { name: "<b>Cheddar Challenger</b>", clicks: 2000, description: "A worthy opponent of all things dairy." },
-            { name: "<b>Rookie Cheeser</b>", clicks: 3000, description: "You still have a lot to learn, little one." },
-            { name: "<b>Cheese Apprentice</b>", clicks: 4000, description: "Your cheese journey is just beginning." },
-            { name: "<b>Feta Fanatic</b>", clicks: 5000, description: "You’re crumbly but committed." },
-            { name: "<b>Better Cheeser</b>", clicks: 7500, description: "You’re getting cheesier by the second!" },
-            { name: "<b>Advanced Cheeser</b>", clicks: 10000, description: "You’ve climbed the first step of cheesedom." },
-            { name: "<b>Cheese Addict</b>", clicks: 15000, description: "You need a cheese intervention." },
-            { name: "<b>Brie Believer</b>", clicks: 20000, description: "You have faith in the cheese gods." },
-            { name: "<b>Curd Connoisseur</b>", clicks: 25000, description: "Your cheese knowledge is expanding." },
-            { name: "<b>Big Cheeser</b>", clicks: 30000, description: "You have leveled up in the cheese ranks." },
-            { name: "<b>Grandmaster Cheeser</b>", clicks: 40000, description: "Only a few can achieve this title." },
-            { name: "<b>Gooey Genius</b>", clicks: 50000, description: "You understand the power of melted cheese." },
-            { name: "<b>The Dairy Overlord</b>", clicks: 75000, description: "Cheese bends to your will." },
-            { name: "<b>Cheese Empire Ruler</b>", clicks: 100000, description: "Your reign over the dairy kingdom begins!" },
-            { name: "<b>Curd King/Queen</b>", clicks: 150000, description: "The curds bow before you." },
-            { name: "<b>Dairy Mastermind</b>", clicks: 200000, description: "Your knowledge of cheese is limitless." },
-            { name: "<b>Ultimate Cheeser</b>", clicks: 250000, description: "Only the cheesiest can earn this rank." },
-            { name: "<b>Lactose Legend</b>", clicks: 300000, description: "Your body has adapted to unlimited dairy." },
-            { name: "<b>Swiss Supreme</b>", clicks: 400000, description: "No holes in your cheesing skills!" },
-            { name: "<b>Brie Monarch</b>", clicks: 500000, description: "You sit upon a throne of soft, creamy cheese." },
-            { name: "<b>Cheese Wizard</b>", clicks: 750000, description: "You cast spells with blocks of cheese." },
-            { name: "<b>The Eternal Cheeser</b>", clicks: 1000000, description: "You have surpassed mortal dairy limits." },
-            { name: "<b>Infinite Cheeser</b>", clicks: 2000000, description: "Your cheese power knows no bounds." },
-            { name: "<b>The Dairy Dimension</b>", clicks: 3000000, description: "You exist in a universe made of cheese." },
-            { name: "<b>Grilled Cheese God</b>", clicks: 4000000, description: "You make the perfect grilled cheese every time." },
-            { name: "<b>Melted Cheese Lord</b>", clicks: 5000000, description: "You control the gooeyness of all cheese." },
-            { name: "<b>Cheese Time Traveler</b>", clicks: 7500000, description: "You can age cheese instantly." },
-            { name: "<b>Brie Almighty</b>", clicks: 10000000, description: "Your presence alone makes cheese stronger." },
-            { name: "<b>Dairy Overlord</b>", clicks: 15000000, description: "You rule over the entire dairy industry." },
-            { name: "<b>Fondue Champion</b>", clicks: 20000000, description: "Everything you touch turns to melted cheese." },
-            { name: "<b>Cheese-Based Lifeform</b>", clicks: 25000000, description: "You have evolved beyond flesh and bone." },
-            { name: "<b>The Cheddar Singularity</b>", clicks: 30000000, description: "Cheese collapses into infinite density around you." },
-            { name: "<b>Supreme Dairy Deity</b>", clicks: 35000000, description: "Your mere presence turns milk into cheese." },
-            { name: "<b>Cheese King/Queen of the Universe</b>", clicks: 40000000, description: "You have surpassed all known cheesers." },
-            { name: "<b>Ultimate Cheesemaster</b>", clicks: 45000000, description: "Even the cows respect your power." },
-            { name: "<b>The Final Cheeser</b>", clicks: 50000000, description: "There is no cheeser beyond you. Or is there?" },
-            { name: "<b>Hyper Cheeser</b>", clicks: 75000000, description: "You exist in a state of pure cheese energy." },
-            { name: "<b>The Dairy Guardian</b>", clicks: 80000000, description: "You protect all that is dairy and good." },
-            { name: "<b>Cheese Reality Bender</b>", clicks: 85000000, description: "You can reshape the world into pure cheese." },
-            { name: "<b>Omnicheese Entity</b>", clicks: 90000000, description: "You are beyond mortal understanding." },
-            { name: "<b>The Lactose Creator</b>", clicks: 95000000, description: "You invented milk itself." },
-            { name: "<b>THE BIGGEST CHEESER</b>", clicks: 100000000, description: "There is no cheese beyond you. YOU ARE CHEESE." }
-        ];
-        
-        let unlockedAdvancements = [];
-        function updateAdvancements() {
-            let advancementsDiv = document.getElementById("advancements");
-            advancementsDiv.innerHTML = "<h2>Advancements</h2>";
-            advancements.forEach(adv => {
-                let isUnlocked = cheeseCount >= adv.clicks;
-                let advancementText = isUnlocked ? `${adv.name}: ${adv.description}` : "???";
-                let advancementClass = isUnlocked ? "" : "locked";
-                let p = document.createElement("p");
-                p.innerHTML = advancementText;
-                p.className = advancementClass;
-                advancementsDiv.appendChild(p);
-            });
-        }
+    { name: "Tiny Cheeser", clicks: 10, description: "You took your first nibble." },
+    { name: "Crumb Cheeser", clicks: 50, description: "You’re gathering the crumbs of greatness." },
+    { name: "Little Cheeser", clicks: 100, description: "You’re a small but mighty cheeser." },
+    { name: "Mini Dairy Dabbler", clicks: 150, description: "Just a little dairy adventurer." },
+    { name: "Cheese Fanatic", clicks: 250, description: "Your love for cheese is growing!" },
+    { name: "Stretchy Cheeser", clicks: 500, description: "Mozzarella magic unlocked." },
+    { name: "Novice Cheeser", clicks: 750, description: "You’re taking cheese seriously now." },
+    { name: "Swiss Starter", clicks: 1000, description: "The holes in your knowledge are filling up." },
+    { name: "Cheddar Challenger", clicks: 2000, description: "A worthy opponent of all things dairy." },
+    { name: "Rookie Cheeser", clicks: 3000, description: "You still have a lot to learn, little one." },
+    { name: "Cheese Apprentice", clicks: 4000, description: "Your cheese journey is just beginning." },
+    { name: "Feta Fanatic", clicks: 5000, description: "You’re crumbly but committed." },
+    { name: "Better Cheeser", clicks: 7500, description: "You’re getting cheesier by the second!" },
+    { name: "Advanced Cheeser", clicks: 10000, description: "You’ve climbed the first step of cheesedom." },
+    { name: "Cheese Addict", clicks: 15000, description: "You need a cheese intervention." },
+    { name: "Brie Believer", clicks: 20000, description: "You have faith in the cheese gods." },
+    { name: "Curd Connoisseur", clicks: 25000, description: "Your cheese knowledge is expanding." },
+    { name: "Big Cheeser", clicks: 30000, description: "You have leveled up in the cheese ranks." },
+    { name: "Grandmaster Cheeser", clicks: 40000, description: "Only a few can achieve this title." },
+    { name: "Gooey Genius", clicks: 50000, description: "You understand the power of melted cheese." },
+    { name: "The Dairy Overlord", clicks: 75000, description: "Cheese bends to your will." },
+    { name: "Cheese Empire Ruler", clicks: 100000, description: "Your reign over the dairy kingdom begins!" },
+    { name: "Curd King/Queen", clicks: 150000, description: "The curds bow before you." },
+    { name: "Dairy Mastermind", clicks: 200000, description: "Your knowledge of cheese is limitless." },
+    { name: "Ultimate Cheeser", clicks: 250000, description: "Only the cheesiest can earn this rank." },
+    { name: "Lactose Legend", clicks: 300000, description: "Your body has adapted to unlimited dairy." },
+    { name: "Swiss Supreme", clicks: 400000, description: "No holes in your cheesing skills!" },
+    { name: "Brie Monarch", clicks: 500000, description: "You sit upon a throne of soft, creamy cheese." },
+    { name: "Cheese Wizard", clicks: 750000, description: "You cast spells with blocks of cheese." },
+    { name: "The Eternal Cheeser", clicks: 1000000, description: "You have surpassed mortal dairy limits." },
+    { name: "Infinite Cheeser", clicks: 2000000, description: "Your cheese power knows no bounds." },
+    { name: "The Dairy Dimension", clicks: 3000000, description: "You exist in a universe made of cheese." },
+    { name: "Grilled Cheese God", clicks: 4000000, description: "You make the perfect grilled cheese every time." },
+    { name: "Melted Cheese Lord", clicks: 5000000, description: "You control the gooeyness of all cheese." },
+    { name: "Cheese Time Traveler", clicks: 7500000, description: "You can age cheese instantly." },
+    { name: "Brie Almighty", clicks: 10000000, description: "Your presence alone makes cheese stronger." },
+    { name: "Dairy Overlord", clicks: 15000000, description: "You rule over the entire dairy industry." },
+    { name: "Fondue Champion", clicks: 20000000, description: "Everything you touch turns to melted cheese." },
+    { name: "Cheese-Based Lifeform", clicks: 25000000, description: "You have evolved beyond flesh and bone." },
+    { name: "The Cheddar Singularity", clicks: 30000000, description: "Cheese collapses into infinite density around you." },
+    { name: "Supreme Dairy Deity", clicks: 35000000, description: "Your mere presence turns milk into cheese." },
+    { name: "Cheese King/Queen of the Universe", clicks: 40000000, description: "You have surpassed all known cheesers." },
+    { name: "Ultimate Cheesemaster", clicks: 45000000, description: "Even the cows respect your power." },
+    { name: "The Final Cheeser", clicks: 50000000, description: "There is no cheeser beyond you. Or is there?" },
+    { name: "Hyper Cheeser", clicks: 75000000, description: "You exist in a state of pure cheese energy." },
+    { name: "The Dairy Guardian", clicks: 80000000, description: "You protect all that is dairy and good." },
+    { name: "Cheese Reality Bender", clicks: 85000000, description: "You can reshape the world into pure cheese." },
+    { name: "Omnicheese Entity", clicks: 90000000, description: "You are beyond mortal understanding." },
+    { name: "The Lactose Creator", clicks: 95000000, description: "You invented milk itself." },
+    { name: "THE BIGGEST CHEESER", clicks: 100000000, description: "There is no cheese beyond you. YOU ARE CHEESE." }
+];
+        let debugCounter = 0;
 
-        document.getElementById("cheese").addEventListener("click", function() {
+        function incrementCheese(event) {
             cheeseCount++;
-            document.getElementById("cheeseCount").textContent = cheeseCount;
-            updateAdvancements();
-        });
-
-        var dots = [],
-            mouse = { x: 0, y: 0 };
-        var Dot = function() {
-            this.x = 0;
-            this.y = 0;
-            this.node = (function(){
-                var n = document.createElement("div");
-                n.className = "trail";
-                document.body.appendChild(n);
-                return n;
-            }());
-        };
-        Dot.prototype.draw = function() {
-            this.node.style.left = this.x + "px";
-            this.node.style.top = this.y + "px";
-        };
-        for (var i = 0; i < 12; i++) {
-            dots.push(new Dot());
+            document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
+            checkAdvancements();
+            createCheeseTrail(event);
         }
-        function draw() {
-            var x = mouse.x, y = mouse.y;
-            dots.forEach(function(dot, index, dots) {
-                var nextDot = dots[index + 1] || dots[0];
-                dot.x = x;
-                dot.y = y;
-                dot.draw();
-                x += (nextDot.x - dot.x) * .6;
-                y += (nextDot.y - dot.y) * .6;
+
+        function checkAdvancements() {
+            advancements.forEach(a => {
+                if (!a.unlocked && cheeseCount >= a.clicks) {
+                    a.unlocked = true;
+                    showNotification(a.name);
+                }
+            });
+            updateAdvancements();
+        }
+
+        function updateAdvancements() {
+            let list = document.getElementById("advancements-list");
+            list.innerHTML = "";
+            advancements.forEach(a => {
+                let div = document.createElement("div");
+                div.className = a.unlocked ? "unlocked" : "advancement";
+                div.innerText = a.unlocked ? `${a.name}: ${a.description}` : "???";
+                list.appendChild(div);
             });
         }
-        addEventListener("mousemove", function(event) {
-            mouse.x = event.pageX;
-            mouse.y = event.pageY;
-        });
-        function animate() {
-            draw();
-            requestAnimationFrame(animate);
+
+        function showNotification(text) {
+            let notification = document.createElement("div");
+            notification.innerText = `Achievement Unlocked: ${text}`;
+            notification.style.position = "fixed";
+            notification.style.bottom = "20px";
+            notification.style.right = "20px";
+            notification.style.padding = "10px";
+            notification.style.backgroundColor = "#ffcc00";
+            notification.style.border = "2px solid #d4a017";
+            document.body.appendChild(notification);
+            document.getElementById("notification-sound").play();
+            setTimeout(() => document.body.removeChild(notification), 3000);
         }
-        animate();
+
+        function toggleAdvancements() {
+            let popup = document.getElementById("advancements-popup");
+            popup.style.display = popup.style.display === "block" ? "none" : "block";
+            updateAdvancements();
+        }
+
+        function createCheeseTrail(event) {
+            let cheeseTrail = document.createElement("div");
+            cheeseTrail.innerText = "🧀";
+            cheeseTrail.style.position = "absolute";
+            cheeseTrail.style.left = `${event.clientX}px`;
+            cheeseTrail.style.top = `${event.clientY}px`;
+            cheeseTrail.style.fontSize = "24px";
+            cheeseTrail.style.pointerEvents = "none";
+            document.body.appendChild(cheeseTrail);
+            setTimeout(() => cheeseTrail.remove(), 1000);
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "d") {
+                debugCounter++;
+                if (debugCounter >= 10) {
+                    let newCheese = prompt("Enter cheese count:");
+                    if (newCheese !== null && !isNaN(newCheese)) {
+                        cheeseCount = parseInt(newCheese);
+                        document.getElementById("cheese-count").innerText = "Cheese: " + cheeseCount;
+                        checkAdvancements();
+                    }
+                    debugCounter = 0;
+                }
+            }
+        });
     </script>
 </body>
 </html>
