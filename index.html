@@ -244,6 +244,7 @@
                     if (!isNaN(newCheeseCount) && newCheeseCount !== null && newCheeseCount.trim() !== "") {
                         cheeseCount = parseInt(newCheeseCount);
                         console.log("Cheese Count set to:", cheeseCount);
+                        updateCheeseDisplay(); // Update the UI immediately
                     } else {
                         console.log("Invalid input. Cheese Count not changed.");
                     }
@@ -251,6 +252,13 @@
             }
         });
 
+        // Function to update the cheese count display
+        function updateCheeseDisplay() {
+            let cheeseDisplay = document.getElementById("cheeseCountDisplay");
+            if (cheeseDisplay) {
+                cheeseDisplay.textContent = "Cheese Count: " + cheeseCount;
+            }
+        }
         // Load saved game data when the page loads
         loadGameData();
     </script>
