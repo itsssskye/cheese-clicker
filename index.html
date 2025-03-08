@@ -72,7 +72,7 @@
     <script>
         let cheeseCount = 0;
         let advancements = [
-    { name: "<strong>Tiny Cheeser</strong>", clicks: 10, description: "You took your first nibble." },
+    { name: "Tiny Cheeser", clicks: 10, description: "You took your first nibble." },
     { name: "Crumb Cheeser", clicks: 50, description: "You’re gathering the crumbs of greatness." },
     { name: "Little Cheeser", clicks: 100, description: "You’re a small but mighty cheeser." },
     { name: "Mini Dairy Dabbler", clicks: 150, description: "Just a little dairy adventurer." },
@@ -148,7 +148,7 @@
             advancements.forEach(a => {
                 let div = document.createElement("div");
                 div.className = a.unlocked ? "unlocked" : "advancement";
-                div.innerText = a.unlocked ? `${a.name}: ${a.description}` : "???";
+                div.innerHTML = a.unlocked ? `${a.name}: ${a.description}` : "???"; // Using innerHTML
                 list.appendChild(div);
             });
         }
